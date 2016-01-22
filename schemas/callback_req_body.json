@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-03/schema",
+  "properties": {
+      "po": {
+          "required": true,
+          "type": "string",
+          "description": "unique Customer PO matching an existing order"
+      },
+      "callback_uri": {
+        "required": true,
+        "type": "string",
+        "description": "a valid URI"
+      }
+  },
+  "required": true,
+  "type": "object"
+}

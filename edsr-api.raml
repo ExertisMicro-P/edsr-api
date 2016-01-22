@@ -1,0 +1,142 @@
+#%RAML 0.8
+title: EDSR
+version: v1
+baseUri: http://edsrapi.exertis.co.uk/api/{version}
+protocols: [ HTTP, HTTPS ]
+
+documentation:
+  - title: Overview
+    content: |
+      The Exertis Digital Stock Room is a digtial product delivery system. Orders
+      placed with Exertis (for example via EDI) for digital products will be fulfilled
+      by delivering digital product license keys into EDSR.
+
+      EDSR is normally accessed via a web portal, however this API gives external
+      systems the ability to obtain key programmatically.
+
+      This API exposes a number of RESTful endpoints. Read this specification
+      carefully before implementing your RESTful client.
+
+      If you are reading this specification as a HTML document
+      then please be aware that this specification is also available as
+      a RAML 0.8 definition file, on request.
+
+  - title: Process
+    content: |
+      The order and fulfilment process is as follows:
+      1. Customer places order with Exertis, via telephone, email or EDI, ensuring
+      a unique Customer PO is used to identify the order.
+      2. Customer's system can poll for the key(s) using this API, or
+      3. Customer's system can register a callback URI to be notified once the key(s)
+      become available.
+
+
+
+securedBy: [basic]
+securitySchemes:
+    - basic:
+        description: |
+            This API supports BasicSecurityScheme Authentication. See
+            https://en.wikipedia.org/wiki/Basic_access_authentication
+            To obtain credentials, contact webteam@exertis.co.uk
+        type: Basic Authentication
+
+
+/stockitems/{po}:
+  displayName: Fetch Stock Items
+  description: |
+    This request can be made after an order for Digital Products has been placed with
+    Exertis. The order may have been place by telephone, email or EDI. The PO reference
+    supplied by the Exertis Customer at time of ordering must be unique and must be supplied in this
+    request to identify which keys to return.
+  uriParameters:
+    po:
+      displayName: Customer PO
+      type: string
+      description: |
+        A unique Customer PO which matches the PO used when placing
+        the order.
+  get:
+    displayName: Fetch Keys for an Order
+    description: |
+      Can be used to poll for availability of keys.
+    responses:
+      200:
+        description: |
+          This response echoes back the PO from the request along with
+          the status, Exertis Order reference and, where the keys are available, all
+          available Items which fulfil the order.
+
+          If any one of the keys for the order are not yet available, status shall be
+          'NOTREADY' and stockitems will not be returned.
+        body:
+          application/json:
+            schema: !include schemas/orderdetails.json
+            example: |
+                {
+                  "po" : "XYZ456",
+                  "status": "READY",
+                  "order_id" : 123,
+                  "stockitems" : [
+                    {
+                      "stockitem_id" : 0,
+                      "partcode" : "MSAAA-2345",
+                      "title" : "Microsoft Office",
+                      "key" : "ABCDE-ABCDE-ABCDE-ABCDE-ABCDE"
+                    },
+                    {
+                      "stockitem_id" : 1,
+                      "partcode" : "MSAAA-4500",
+                      "title" : "Microsoft Access",
+                      "key" : "ABCDE-ABCDE-YMNHY-ABCDE-ABCDE"
+                    }
+                  ]
+                }
+
+
+
+/callback:
+  displayName: Set Callback
+  description: |
+    This request can be made after an order for Digital Products has been placed with
+    Exertis. It provides a way for the Customer system to be notified of the
+    digital product keys once they become available, as opposed to polling using
+    the orderdetails/{po} GET request.
+  post:
+    description: |
+      Registers a callback URI with EDSR.
+
+      Once the specified PO is fulfilled and all the keys are available, EDSR shall
+      make a HTTP POST request to the callback_uri, with a body as per the
+      orderdetails/{po} response, thus 'pushing' the keys to the customer.
+
+      The callback is made only once and does not expect a response.
+    body:
+      application/json:
+        schema: !include schemas/callback_req_body.json
+        example: |
+          {
+            "po": "XYZ456",
+            "callback_uri" : "https://api.mycompany.com/tellmethe keys.php"
+          }
+        description: |
+          Specifies the PO the caller is interested in and the URI to be hit
+          once all the keys are available
+    responses:
+      200:
+        description:
+          Returns an indication of the success in the 'status' property and with further details in the 'result' property
+
+          'status' can be 'SUCCESS' or 'FAIL'.
+
+          'result' can be
+          - CALLBACKREGISTERED, or
+          - UKNNOWNPO, or
+          - ERROR
+        body:
+          application/json:
+            example: |
+              {
+                "status": "SUCCESS",
+                "result": "CALLBACKREGISTERED"
+              }

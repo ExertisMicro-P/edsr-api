@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema",
+    "properties": {
+        "po": {
+            "required": true,
+            "type": "string"
+        },
+        "status": {
+          "required": true,
+          "type":"string",
+          "enum": ["READY","NOTREADY"]
+        },
+        "order_id": {
+          "required": false,
+          "type": "number"
+        },
+        "stockitems" : {
+          "required": false,
+          "type": "array",
+          "items": {
+            "stockitem_id": "number",
+            "partcode": "string",
+            "title": "string",
+            "key": "string"
+          }
+        }
+    },
+    "required": true,
+    "type": "object"
+}
