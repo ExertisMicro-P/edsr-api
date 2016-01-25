@@ -15,3 +15,5 @@ Details of body payloads are expressed using JSON Schemas within the `schemas` f
 
 ###Contributing
 Contributions may be made via Pull Requests. Only the `.raml` and `.json` schemas should be modified.
+
+We recommend using the Atom editor https://atom.io/ with the `api-workbench` package http://apiworkbench.com/. API Workbench's `Open API Console` feature provides a useful tool for visualizing RAML APIs.
