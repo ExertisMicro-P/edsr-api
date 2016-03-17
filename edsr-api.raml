@@ -26,7 +26,7 @@ documentation:
   - title: Process
     content: |
       The order and fulfilment process is as follows:
-      1. Customer places order with Exertis, via telephone, email or EDI, ensuring
+      1. Customer places order with Exertis, via telephone, email, EDSR or EDI, ensuring
       a unique Customer PO is used to identify the order.
       2. Customer's system can poll for the key(s) using this API, or
       3. Customer's system can register a callback URI to be notified once the key(s)
@@ -48,7 +48,7 @@ securitySchemes:
   displayName: Fetch Stock Items
   description: |
     This request can be made after an order for Digital Products has been placed with
-    Exertis. The order may have been place by telephone, email or EDI. The PO reference
+    Exertis. The order may have been place by telephone, email, EDSR or EDI. The PO reference
     supplied by the Exertis Customer at time of ordering must be unique and must be supplied in this
     request to identify which keys to return.
   uriParameters:
@@ -133,7 +133,7 @@ securitySchemes:
 
           'result' can be
           - CALLBACKREGISTERED, or
-          - UKNNOWNPO, or
+          - UNKNOWNPO, or
           - ERROR
         body:
           application/json:
